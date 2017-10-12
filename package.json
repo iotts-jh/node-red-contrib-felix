@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "Node-RED palette of nodes for sending data to the Felix platform.",
   "main": "none",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iotts-jh/node-red-contrib-felix.git"
+  },
   "keywords": [
     "felix",
     "felixknows",
