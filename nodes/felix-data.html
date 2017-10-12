@@ -1,0 +1,140 @@
+<!--
+  Copyright IOT Technology Solutions
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/x-red" data-template-name="felix-data">
+  <div class="form-row" id="apikey-row">
+      <label for="node-input-apikey"><i class="fa"></i> <span>Felix API Key</span></label>
+      <input type="text" id="node-input-apikey">
+  </div>
+  <div class="form-row" id="device-row">
+      <label for="node-input-device"><i class="fa"></i> <span>Device ID</span></label>
+      <input type="text" id="node-input-device">
+  </div>
+  <div class="form-row" id="channel-row">
+      <label for="node-input-channel"><i class="fa"></i> <span>Channel</span></label>
+      <input type="text" id="node-input-channel">
+  </div>
+  <div class="form-row" id="payload-value-row">
+      <label for="node-input-valtag"><i class="fa"></i> <span>Value Tag</span></label>
+      <input type="text" id="node-input-valtag">
+  </div>
+  <div class="form-row" id="payload-units-row">
+      <label for="node-input-units"><i class="fa"></i> <span>Units</span></label>
+      <input type="text" id="node-input-units">
+  </div>
+  <div class="form-row">
+    <input type="checkbox" id="node-input-usetls" style="display: inline-block; width: auto; vertical-align: top;">
+    <label for="node-input-usetls" style="width: auto">Enable secure (SSL/TLS) connection</label>
+    <div id="node-row-tls" class="hide">
+      <label style="width: auto; margin-left: 20px; margin-right: 10px;" for="node-input-tls"><span>TLS Configuration</span></label><input type="text" style="width: 300px" id="node-input-tls">
+    </div>
+  </div>
+  <div class="form-row" id="url-override-row">
+      <label for="node-input-url"><i class="fa fa-globe"></i> <span>URL</span></label>
+      <input type="text" id="node-input-url" placeholder="Data collection URL">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-tips"><b>Tip:</b> Leave the Value Tag field blank if the payload of the input message only contains the value and not a JSON structure.</div>
+</script>
+
+<script type="text/x-red" data-help-name="felix-data">
+  <p>Posts data to Felix and returns the response.</p>
+
+  <h3>Node Properties</h3>
+  <dl class="message-properties">
+    <dt class="required">Felix API Key <span class="property-type">string</span></dt>
+    <dd>The required API Key for the Felix Tenant/Company this data is intended for.</dd>
+    <dt class="required">Device ID <span class="property-type">string</span></dt>
+    <dd>The required Device ID appended to the URL to post the data to Felix.</dd>
+    <dt class="required">Channel <span class="property-type">string</span></dt>
+    <dd>The required Channel/Stream path the data is for.</dd>
+    <dt class="optional">Value Tag <span class="property-type">string</span></dt>
+    <dd>The name of the JSON tag in the message payload containing the value to send to Felix. If not set then the message payload must be a simple string or numeric value which will get sent.</dd>
+    <dt class="optional">Units <span class="property-type">string</span></dt>
+    <dd>An optional Units string for the data type. If set, it will be included in the data sent to Felix.</dd>
+  </dl>
+  <h3>Input Message Properties</h3>
+  <dl class="message-properties">
+      <dt class="required">payload <span class="property-type">string</span></dt>
+      <dd>Either a string or numeric value to be sent to Felix, or a JSON structure which includes a tag/element containing the value to be sent to Felix.</dd>
+  </dl>
+  <h3>Output Message Properties</h3>
+  <dl class="message-properties">
+      <dt>statusCode <span class="property-type">number</span></dt>
+      <dd>The status code of the response, or the error code if the request could not be completed.</dd>
+      <dt>headers <span class="property-type">object</span></dt>
+      <dd>An object containing the response headers.</dd>
+      <dt>responseUrl <span class="property-type">string</span></dt>
+      <dd>In case any redirects occurred while processing the request, this property is the final redirected url.
+          Otherwise, the url of the original request.</dd>
+      <dt>requestHeaders <span class="property-type">object</span></dt>
+      <dd>An object containing the original request headers.</dd>
+      <dt>requestPayload <span class="property-type">string</span></dt>
+      <dd>The JSON body/payload included in the request.</dd>
+  </dl>
+
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('felix-data',{
+        category: 'function',
+        color:"#ff5555",
+        defaults: {
+            name: {value:""},
+            device: {value:"", required:true},
+            channel: {value:"", required:true},
+            valtag: {value:""},
+            units: {value:""},
+            url: {value:"", required:true, validate:function(v) { return (v.trim().length !== 0) || (v.indexOf("://") !== -1) || (v.trim().indexOf("http") === 0)} },
+            tls: {type:"tls-config", required:false}
+        },
+        credentials: {
+            apikey: {type:"text",required:true},
+        },
+        inputs:1,
+        outputs:1,
+        icon: "sta.png",
+        label: function() {
+            return this.name||"felix data";
+        },
+        oneditprepare: function() {
+          function updateTLSOptions() {
+              if ($("#node-input-usetls").is(':checked')) {
+                  $("#node-row-tls").show();
+              } else {
+                  $("#node-row-tls").hide();
+              }
+          }
+          if (this.tls) {
+              $('#node-input-usetls').prop('checked', true);
+          } else {
+              $('#node-input-usetls').prop('checked', false);
+          }
+          updateTLSOptions();
+          $("#node-input-usetls").on("click",function() {
+              updateTLSOptions();
+          });
+        },
+        oneditsave: function() {
+            if (!$("#node-input-usetls").is(':checked')) {
+                $("#node-input-usetls").val("_ADD_");
+            }
+        }
+    });
+</script>
