@@ -11,12 +11,18 @@ A collection of [node-red](http://nodered.org) nodes for the IOT Technology Solu
 To install the stable version run the following command in your Node-RED user directory (typically `~/.node-red`):
 
     npm i node-red-contrib-felix
-    
+
 Start/Restart your Node-RED instance and you should have the Felix nodes listed in the next section available in the palettes.
 
 ## Node List
  - Felix Data (IoT Technology Solutions)
 
+## Publishing
+To publish updates:
+- Increment the version number in the package.json file.
+- In the root project folder run the npm publish command.
+
+      npm publish
 
 ### Descriptions
 
