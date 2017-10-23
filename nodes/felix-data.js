@@ -131,7 +131,7 @@ module.exports = function(RED) {
           payload = '{timestamp:'+ts+',values:[{id:"'+nodeChannel+'",v:'+msg.payload+','+units+'q:true,t:'+ts+'}]}';
         } else {
           var val = msg.payload[nodeValTag];
-          if (null !== val) {
+          if (typeof val !== "undefined") {
             if (typeof val === "string") {
               payload = '{timestamp:'+ts+',values:[{id:"'+nodeChannel+'",v:"'+val+'",'+units+'q:true,t:'+ts+'}]}';
             } else if (typeof val == "number") {
@@ -139,8 +139,8 @@ module.exports = function(RED) {
             } else if (typeof val == "boolean") {
               payload = '{timestamp:'+ts+',values:[{id:"'+nodeChannel+'",v:'+val+',q:true,t:'+ts+'}]}';
             } else {
-              node.error("Invalid value type");
-              node.status({fill:"red",shape:"ring",text:"Invlaid value type"});
+              node.error("Unsupported value type: " + typeof val);
+              node.status({fill:"red",shape:"ring",text:"Unsupported value type: " + typeof val});
               return;
             }
           } else {
