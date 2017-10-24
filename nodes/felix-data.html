@@ -17,7 +17,7 @@
 <script type="text/x-red" data-template-name="felix-data">
   <div class="form-row" id="apikey-row">
       <label for="node-input-apikey"><i class="fa"></i> <span>Felix API Key</span></label>
-      <input type="text" id="node-input-apikey">
+      <input type="password" id="node-input-apikey">
   </div>
   <div class="form-row" id="device-row">
       <label for="node-input-device"><i class="fa"></i> <span>Device ID</span></label>
@@ -105,7 +105,7 @@
             tls: {type:"tls-config", required:false}
         },
         credentials: {
-            apikey: {type:"text",required:true},
+            apikey: {type:"password",required:true},
         },
         inputs:1,
         outputs:1,

@@ -21,10 +21,16 @@
  * TODOs
  * =====
  * - TODO: Allow incoming message to include apikey, device, channel, and/or units properties that if present
- *   will override the configured value.
+ *         will override the configured value.
+ *
+ * - TODO: Allow multiple Tag Values (and channel name and units for each) to be reported from incoming message in a
+ *         single post (see Edit Dropdown Node in Dashboard palette for example of adding multiple config entries).
  *
  * - TODO: Allow setting a rate limit, and queue data values internally until time to send, but then send all values
- *   (and possibly provide ability to limit to only include last value).
+ *         (and possibly provide ability to limit to only include last value).
+ *
+ * - TODO: Extract Felix URL, TLS setting, device and APIKey into a named config object/node that can be shared across
+ *         Felix nodes.
  *
  * - TODO: Allow other Felix headers to be configured and/or overridden (device type, manufacturer, protocol, version).
  *
@@ -158,7 +164,7 @@ module.exports = function(RED) {
           }
         }
       }
-      this.log("Payload:"+payload);
+      //this.log("Payload:"+payload);
 
       var urltotest = url;
       var noproxy;
@@ -270,6 +276,6 @@ module.exports = function(RED) {
     });
   }
 
-  RED.nodes.registerType("felix-data", felixDataNode, {credentials: {apikey:{type:"text"}}}
+  RED.nodes.registerType("felix-data", felixDataNode, {credentials: {apikey:{type:"password"}}}
   );
 }
