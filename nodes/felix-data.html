@@ -16,23 +16,23 @@
 
 <script type="text/x-red" data-template-name="felix-data">
   <div class="form-row" id="apikey-row">
-      <label for="node-input-apikey"><i class="fa"></i> <span>Felix API Key</span></label>
+      <label for="node-input-apikey"><i class="fa"></i> <span>Felix API Key (apiKey)</span></label>
       <input type="password" id="node-input-apikey">
   </div>
   <div class="form-row" id="device-row">
-      <label for="node-input-device"><i class="fa"></i> <span>Device ID</span></label>
+      <label for="node-input-device"><i class="fa"></i> <span>Device ID (dvcId)</span></label>
       <input type="text" id="node-input-device">
   </div>
   <div class="form-row" id="channel-row">
-      <label for="node-input-channel"><i class="fa"></i> <span>Channel</span></label>
+      <label for="node-input-channel"><i class="fa"></i> <span>Channel (channel)</span></label>
       <input type="text" id="node-input-channel">
   </div>
   <div class="form-row" id="payload-value-row">
-      <label for="node-input-valtag"><i class="fa"></i> <span>Value Tag</span></label>
+      <label for="node-input-valtag"><i class="fa"></i> <span>Value Tag (valueTag)</span></label>
       <input type="text" id="node-input-valtag">
   </div>
   <div class="form-row" id="payload-units-row">
-      <label for="node-input-units"><i class="fa"></i> <span>Units</span></label>
+      <label for="node-input-units"><i class="fa"></i> <span>Units (units)</span></label>
       <input type="text" id="node-input-units">
   </div>
   <div class="form-row">
@@ -51,6 +51,7 @@
     <input type="text" id="node-input-name" placeholder="Name">
   </div>
   <div class="form-tips"><b>Tip:</b> Leave the Value Tag field blank if the payload of the input message only contains the value and not a JSON structure.</div>
+  <div class="form-tips"><b>Tip:</b> Override the configured settings by including an attribute on the incoming message with the name within parenthesis.</div>
 </script>
 
 <script type="text/x-red" data-help-name="felix-data">
@@ -58,21 +59,31 @@
 
   <h3>Node Properties</h3>
   <dl class="message-properties">
-    <dt class="required">Felix API Key <span class="property-type">string</span></dt>
-    <dd>The required API Key for the Felix Tenant/Company this data is intended for.</dd>
-    <dt class="required">Device ID <span class="property-type">string</span></dt>
-    <dd>The required Device ID appended to the URL to post the data to Felix.</dd>
-    <dt class="required">Channel <span class="property-type">string</span></dt>
-    <dd>The required Channel/Stream path the data is for.</dd>
+    <dt class="optional">Felix API Key <span class="property-type">string</span></dt>
+    <dd>The API Key for the Felix Tenant/Company this data is intended for (required if not included in incoming message 'apiKey' property).</dd>
+    <dt class="optional">Device ID <span class="property-type">string</span></dt>
+    <dd>The Device ID appended to the URL to post the data to Felix (required if not included in incoming message 'dvcId' property).</dd>
+    <dt class="optional">Channel <span class="property-type">string</span></dt>
+    <dd>The Channel/Stream path the data is for (required if not included in incoming message 'channel' property).</dd>
     <dt class="optional">Value Tag <span class="property-type">string</span></dt>
-    <dd>The name of the JSON tag in the message payload containing the value to send to Felix. If not set then the message payload must be a simple string or numeric value which will get sent.</dd>
+    <dd>The name of the JSON tag in the message payload containing the value to send to Felix (may be set in incoming message 'valueTag' property). If not set then the message payload must be a simple string or numeric value which will get sent.</dd>
     <dt class="optional">Units <span class="property-type">string</span></dt>
-    <dd>An optional Units string for the data type. If set, it will be included in the data sent to Felix.</dd>
+    <dd>The Units string for the data type (may be set in incoming message 'units' property). If set, it will be included in the data sent to Felix.</dd>
   </dl>
   <h3>Input Message Properties</h3>
   <dl class="message-properties">
       <dt class="required">payload <span class="property-type">string</span></dt>
       <dd>Either a string or numeric value to be sent to Felix, or a JSON structure which includes a tag/element containing the value to be sent to Felix.</dd>
+      <dt class="optional">apiKey <span class="property-type">string</span></dt>
+      <dd>An optional API Key to override the configured Felix API Key.</dd>
+      <dt class="optional">dvcId <span class="property-type">string</span></dt>
+      <dd>An optional Device ID to override the configured Device ID.</dd>
+      <dt class="optional">Channel <span class="property-type">string</span></dt>
+      <dd>An optional Channel path to override the configured Channel path.</dd>
+      <dt class="optional">Value Tag <span class="property-type">string</span></dt>
+      <dd>An optional JSON tag to override the configured JSON tag specifying the value to send to Felix.</dd>
+      <dt class="optional">Units <span class="property-type">string</span></dt>
+      <dd>An optional Units string to override the configured Units string.</dd>
   </dl>
   <h3>Output Message Properties</h3>
   <dl class="message-properties">
@@ -97,15 +108,15 @@
         color:"#ff5555",
         defaults: {
             name: {value:""},
-            device: {value:"", required:true},
-            channel: {value:"", required:true},
+            device: {value:""},
+            channel: {value:""},
             valtag: {value:""},
             units: {value:""},
             url: {value:"", required:true, validate:function(v) { return (v.trim().length !== 0) || (v.indexOf("://") !== -1) || (v.trim().indexOf("http") === 0)} },
             tls: {type:"tls-config", required:false}
         },
         credentials: {
-            apikey: {type:"password",required:true},
+            apikey: {type:"password"},
         },
         inputs:1,
         outputs:1,

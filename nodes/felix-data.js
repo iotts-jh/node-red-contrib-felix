@@ -18,11 +18,11 @@
  * - API Key is stored as a credential, so it is not included in exports
  *   (see https://nodered.org/docs/creating-nodes/credentials)
  *
+ * - Incoming message can specify 'msg.apiKey', 'msg.dvcId', 'msg.channel',
+ *   'msg.units', and 'msg.valueTag' to override the corresponding configured values.
+ *
  * TODOs
  * =====
- * - TODO: Allow incoming message to include apikey, device, channel, and/or units properties that if present
- *         will override the configured value.
- *
  * - TODO: Allow multiple Tag Values (and channel name and units for each) to be reported from incoming message in a
  *         single post (see Edit Dropdown Node in Dashboard palette for example of adding multiple config entries).
  *
@@ -93,28 +93,42 @@ module.exports = function(RED) {
         url =+ '/';
       }
 
-      if (!nodeApiKey) {
-        node.error("API Key must be configured");
+      var useApiKey = nodeApiKey;
+      if (null !== msg.apiKey && 0 < msg.apiKey.length) {
+          useApiKey = msg.apiKey;
+      }
+      if (!useApiKey) {
+        node.error("Felix API Key must be configured, or specified as 'apiKey' field of input message");
         node.status({fill:"red",shape:"ring",text:"API Key Required"});
         return;
       }
-      if (!nodeDevice) {
-        node.error("Device ID must be configured");
+
+      var useDevice = nodeDevice;
+      if (null !== msg.dvcId && 0 < msg.dvcId.length) {
+          useDevice = msg.dvcId;
+      }
+      if (!useDevice) {
+        node.error("Device ID must be configured, or specified as 'dvcId' field of input message");
         node.status({fill:"red",shape:"ring",text:"Device ID Required"});
         return;
       }
-      if (!nodeChannel) {
-        node.error("Channel Path must be configured");
+
+      var useChannel = nodeChannel;
+      if (null !== msg.channel && 0 < msg.channel.length) {
+          useChannel = msg.channel;
+      }
+      if (!useChannel) {
+        node.error("Channel Path must be configured, or specified as 'channel' field of input message");
         node.status({fill:"red",shape:"ring",text:"Channel Path Required"});
         return;
       }
 
-      url = url + nodeDevice;
+      url = url + useDevice;
 
       var opts = urllib.parse(url);
       opts.method = "POST";
       opts.headers = {
-        "x-api-key"       : nodeApiKey,
+        "x-api-key"       : useApiKey,
         "x-dvc-type-cd"   : "PLC-Gateway",
         "x-mfr-id"        : "Kepware",
         "x-proto-id"      : "IOT-KEPWARE",
@@ -127,23 +141,31 @@ module.exports = function(RED) {
       var payload = null;
       var ts = (new Date()).getTime();
 
-      var units = nodeUnits;
-      if (!units) { units = ""; } else { units = 'u:"'+units+'",'; }
+      var useUnits = nodeUnits;
+      if (null !== msg.units) {
+          useUnits = msg.units;
+      }
+      if (!useUnits) { useUnits = ""; } else { useUnits = 'u:"'+useUnits+'",'; }
+
+      var useValueTag = nodeValTag;
+      if (null !== msg.valueTag) {
+          useValueTag = msg.valueTag;
+      }
 
       if (typeof msg.payload !== "undefined") {
         if (typeof msg.payload === "string" || Buffer.isBuffer(msg.payload)) {
-          payload = '{timestamp:'+ts+',values:[{id:"'+nodeChannel+'",v:"'+msg.payload+'",'+units+'q:true,t:'+ts+'}]}';
+          payload = '{timestamp:'+ts+',values:[{id:"'+useChannel+'",v:"'+msg.payload+'",'+useUnits+'q:true,t:'+ts+'}]}';
         } else if (typeof msg.payload == "number") {
-          payload = '{timestamp:'+ts+',values:[{id:"'+nodeChannel+'",v:'+msg.payload+','+units+'q:true,t:'+ts+'}]}';
+          payload = '{timestamp:'+ts+',values:[{id:"'+useChannel+'",v:'+msg.payload+','+useUnits+'q:true,t:'+ts+'}]}';
         } else {
-          var val = msg.payload[nodeValTag];
+          var val = msg.payload[useValueTag];
           if (typeof val !== "undefined") {
             if (typeof val === "string") {
-              payload = '{timestamp:'+ts+',values:[{id:"'+nodeChannel+'",v:"'+val+'",'+units+'q:true,t:'+ts+'}]}';
+              payload = '{timestamp:'+ts+',values:[{id:"'+useChannel+'",v:"'+val+'",'+useUnits+'q:true,t:'+ts+'}]}';
             } else if (typeof val == "number") {
-              payload = '{timestamp:'+ts+',values:[{id:"'+nodeChannel+'",v:'+val+','+units+'q:true,t:'+ts+'}]}';
+              payload = '{timestamp:'+ts+',values:[{id:"'+useChannel+'",v:'+val+','+useUnits+'q:true,t:'+ts+'}]}';
             } else if (typeof val == "boolean") {
-              payload = '{timestamp:'+ts+',values:[{id:"'+nodeChannel+'",v:'+val+',q:true,t:'+ts+'}]}';
+              payload = '{timestamp:'+ts+',values:[{id:"'+useChannel+'",v:'+val+',q:true,t:'+ts+'}]}';
             } else {
               node.error("Unsupported value type: " + typeof val);
               node.status({fill:"red",shape:"ring",text:"Unsupported value type: " + typeof val});
