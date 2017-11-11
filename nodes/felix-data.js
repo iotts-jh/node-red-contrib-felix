@@ -94,7 +94,7 @@ module.exports = function(RED) {
       }
 
       var useApiKey = nodeApiKey;
-      if (null !== msg.apiKey && 0 < msg.apiKey.length) {
+      if ("undefined" !== typeof msg.apiKey && 0 < msg.apiKey.length) {
           useApiKey = msg.apiKey;
       }
       if (!useApiKey) {
@@ -104,7 +104,7 @@ module.exports = function(RED) {
       }
 
       var useDevice = nodeDevice;
-      if (null !== msg.dvcId && 0 < msg.dvcId.length) {
+      if ("undefined" !== typeof msg.dvcId && 0 < msg.dvcId.length) {
           useDevice = msg.dvcId;
       }
       if (!useDevice) {
@@ -114,7 +114,7 @@ module.exports = function(RED) {
       }
 
       var useChannel = nodeChannel;
-      if (null !== msg.channel && 0 < msg.channel.length) {
+      if ("undefined" !== typeof msg.channel && 0 < msg.channel.length) {
           useChannel = msg.channel;
       }
       if (!useChannel) {

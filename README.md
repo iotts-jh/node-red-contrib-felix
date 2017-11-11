@@ -9,22 +9,22 @@ A collection of [node-red](http://nodered.org) nodes for the IOT Technology Solu
 ## Installation
 
 To install the stable version run the following command in your Node-RED user directory (typically `~/.node-red`):
-
-    npm i node-red-contrib-felix
-
+```
+npm i node-red-contrib-felix
+```
 Start/Restart your Node-RED instance and you should have the Felix nodes listed in the next section available in the palettes.
 
 ## Develpoment and Local testing
 To test a node module locally, the npm link command can be used. This allows you to develop the node in a local directory and have it linked into a local node-red install, as if it had been npm installed.
 
 1. In the directory containing the node’s <code>package.json</code> file, run:
-
-        sudo npm link
-
+```
+sudo npm link
+```
 2. In your node-red user directory, typically <code>~/.node-red</code> run:
-
-        npm link node-red-contrib-felix
-
+```
+npm link node-red-contrib-felix
+```
 This creates the appropriate symbolic links between the two directories so Node-RED will discover the node when it starts. Any changes to the node’s file can be picked up by simply restarting Node-RED.
 
 ## Node List
@@ -34,9 +34,9 @@ This creates the appropriate symbolic links between the two directories so Node-
 To publish updates:
 - Increment the version number in the package.json file.
 - In the root project folder run the npm publish command.
-
-      npm publish
-
+```
+npm publish
+```
 ### Descriptions
 
 ##### Felix-Data
